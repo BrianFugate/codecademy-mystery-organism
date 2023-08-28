@@ -17,29 +17,30 @@ const mockUpStrand = () => {
 const pAequorFactory = (specimenNum, dna) => {
     return {specimenNum: specimenNum,
             dna: dna,
-            mutate() {
-                const mutateLocation = Math.floor(Math.random() * 14);
+            mutate() { // mutates one randomly selected base in the dna strand
+                const mutateLocation = Math.floor(Math.random() * (this.dna.length - 1));
                 let mutatedBase = '';
                 do {
                     mutatedBase = returnRandBase();
                 } while (mutatedBase == this.dna[mutateLocation]);
                 this.dna[mutateLocation] = mutatedBase;
             },
-            compareDNA(otherDNA) {
+            compareDNA(otherOrg) { // compares two pAequor objects' DNA
                 let count = 0;
-                for (let i = 0; i < 15; i++) {
-                    if (dna[i] == otherDNA[i]) count++;
+                for (let i = 0; i < this.dna.length; i++) {
+                    if (dna[i] == otherOrg.dna[i]) count++;
                 }
-                console.log('\nSpecimen #1 and specimen #2 have ' + count / 15 * 100 + '% DNA in common');
+                console.log(`Specimen #${this.specimenNum} and specimen #${otherOrg.specimenNum} have ` 
+                + count / this.dna.length * 100 + '% DNA in common');
             },
-            willLikelySurvive() {
+            willLikelySurvive() { // decides if current object will survive
                 let goodBases = 0;
                 for (const base of dna) {
                     if (base == 'C' || base == 'G') goodBases++;
                 }
-                return goodBases / 15 >= .6 ? true : false;
+                return goodBases / this.dna.length >= .6 ? true : false;
             },
-            complementStrand() {
+            complementStrand() { // returns the complementary dna strand on the current object
                 const compStrand = [];
                 for (const base of dna) {
                     compStrand.push(base == 'A' ? 'T':
@@ -52,24 +53,29 @@ const pAequorFactory = (specimenNum, dna) => {
             }};
 }
 
-// Generate array of 30 instances of pAequor
+// Generate array of 30 instances of pAequor that will likely survive
 const orgArray = [];
+let testOrganism = {};
 for (let i = 1; i <= 30; i++) {
-    orgArray.push(pAequorFactory(i, mockUpStrand()));
+    do {
+        testOrganism = pAequorFactory(i, mockUpStrand());
+    } while (testOrganism.willLikelySurvive() == false);
+    orgArray.push(testOrganism);
 }
 
 // Log pAequor array to console
 for (const organism of orgArray) {
-    console.log('Specimen: #' + organism.specimenNum + ' DNA: ' + organism.dna.join(''));
+    console.log('Specimen: #' + organism.specimenNum + ' DNA: ' + organism.dna.join('')
+    + ' Will likely survive: ' + organism.willLikelySurvive());
 }
 
 // Test object methods
-orgArray[0].compareDNA(orgArray[1].dna);
-console.log('Specimen #1 will likely survive: ' + orgArray[0].willLikelySurvive());
-console.log('\n\nMutating specimen #1 DNA\n');
+console.log();
+orgArray[0].compareDNA(orgArray[2]);
+console.log('Mutating specimen #1 DNA');
 orgArray[0].mutate();
-orgArray[0].compareDNA(orgArray[1].dna);
-console.log('Specimen #1 will likely survive: ' + orgArray[0].willLikelySurvive());
+orgArray[0].compareDNA(orgArray[2]);
+
 
 console.log('\n\nTesting complementStrand method:');
 console.log('Specimen #1 Strand: ' + orgArray[0].dna.join(''));
