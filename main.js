@@ -38,6 +38,17 @@ const pAequorFactory = (specimenNum, dna) => {
                     if (base == 'C' || base == 'G') goodBases++;
                 }
                 return goodBases / 15 >= .6 ? true : false;
+            },
+            complementStrand() {
+                const compStrand = [];
+                for (const base of dna) {
+                    compStrand.push(base == 'A' ? 'T':
+                                    base == 'T' ? 'A':
+                                    base == 'C' ? 'G':
+                                    base == 'G' ? 'C':
+                                    null);
+                }
+                return compStrand;
             }};
 }
 
@@ -59,3 +70,7 @@ console.log('\n\nMutating specimen #1 DNA\n');
 orgArray[0].mutate();
 orgArray[0].compareDNA(orgArray[1].dna);
 console.log('Specimen #1 will likely survive: ' + orgArray[0].willLikelySurvive());
+
+console.log('\n\nTesting complementStrand method:');
+console.log('Specimen #1 Strand: ' + orgArray[0].dna.join(''));
+console.log('Complement Strand:  ' + orgArray[0].complementStrand().join(''));
