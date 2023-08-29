@@ -25,13 +25,14 @@ const pAequorFactory = (specimenNum, dna) => {
                 } while (mutatedBase == this.dna[mutateLocation]);
                 this.dna[mutateLocation] = mutatedBase;
             },
-            compareDNA(otherOrg) { // compares two pAequor objects' DNA
+            compareDNA(otherOrg, output) { // compares two pAequor objects' DNA and optionally output result
                 let count = 0;
                 for (let i = 0; i < this.dna.length; i++) {
                     if (dna[i] == otherOrg.dna[i]) count++;
                 }
-                console.log(`Specimen #${this.specimenNum} and specimen #${otherOrg.specimenNum} have ` 
-                + count / this.dna.length * 100 + '% DNA in common');
+                if (output != false) console.log(`Specimen #${this.specimenNum} and specimen #${otherOrg.specimenNum} have `
+                 + count / this.dna.length * 100 + '% DNA in common');
+                return count / this.dna.length * 100;
             },
             willLikelySurvive() { // decides if current object will survive
                 let goodBases = 0;
@@ -69,14 +70,28 @@ for (const organism of orgArray) {
     + ' Will likely survive: ' + organism.willLikelySurvive());
 }
 
-// Test object methods
+// Test mutate method
 console.log();
 orgArray[0].compareDNA(orgArray[2]);
 console.log('Mutating specimen #1 DNA');
 orgArray[0].mutate();
 orgArray[0].compareDNA(orgArray[2]);
 
-
+// Test complementStrand Method
 console.log('\n\nTesting complementStrand method:');
 console.log('Specimen #1 Strand: ' + orgArray[0].dna.join(''));
 console.log('Complement Strand:  ' + orgArray[0].complementStrand().join(''));
+
+// Find two most related instances of pAequor
+const mostRelated = {orgamism1: 0, orgamism2: 0, percent: 0};
+for (let i = 0; i < orgArray.length; i++) {
+    for (let j = 0; j < orgArray.length; j++) {
+        if (i != j && orgArray[i].compareDNA(orgArray[j], false) > mostRelated.percent) {
+            mostRelated.orgamism1 = orgArray[i].specimenNum;
+            mostRelated.orgamism2 = orgArray[j].specimenNum;
+            mostRelated.percent = orgArray[i].compareDNA(orgArray[j], false);
+        }
+    }
+}
+console.log(`\nThe most related specimens are #${mostRelated.orgamism1} and #${mostRelated.orgamism2}`
+ + ` with a match of ${mostRelated.percent}%`);
